@@ -155,7 +155,47 @@
                               <?php
 
 
-                                $tsql = "   ";
+                                $tsql = "SELECT
+                                MIS_CAT_proyectos.CVE_CRE_IF,
+                                MIS_CAT_proyectos.CVE_CRE_ID_OFERTA,
+                                MIS_CAT_proyectos.NOM_PROYECTO,
+                                MIS_CAT_proyectos.NUM_REF_SHF,
+                                MIS_CAT_proyectos.NOM_PROMOTOR,
+                                MIS_CAT_proyectos.TIPO_CREDITO,
+                                MIS_CAT_proyectos.UBICACIÓN_EDO,
+                                MIS_CAT_proyectos.UBICACIÓN_MUN,
+                                MIS_CAT_proyectos.FECH_INI_CONTRATO,
+                                MIS_CAT_proyectos.LINEA_DE_CRE_POR_PROYECTO,
+                                MIS_CAT_proyectos.VALOR_PROYECTO,
+                                MIS_CAT_proyectos.TASA_INTERES,
+                                MIS_CAT_proyectos.VIV_TOTALES_PROYECTO,
+                                MIS_CAT_proyectos.COLATERAL,
+                                MIS_colaterales.NOM_PROYECTO,
+                                MIS_colaterales.FECH_COLATERAL,
+                                MIS_colaterales.FECH_FIN_CONTRATO,
+                                MIS_colaterales.AO_VIV_ACTIVAS,
+                                MIS_colaterales.VIV_LIB_CORTE_ANTERIOR,
+                                MIS_colaterales.VIV_LIB_PERIODO,
+                                MIS_colaterales.ACUM_VIV_LIB_FIN_P,
+                                MIS_colaterales.MONTO_MIN_ACUM_P_ANTERIOR,
+                                MIS_colaterales.MONTO_MIN_PERIODO,
+                                MIS_colaterales.MONTO_MIN_ACUM_FIN_P,
+                                MIS_colaterales.MONTO_POR_DISPONER,
+                                MIS_colaterales.MONTO_AMORT_ACUM_P_ANTERIOR,
+                                MIS_colaterales.MONTO_AMORTIZADO_PERIODO,
+                                MIS_colaterales.MONTO_AMORT_ACUM_FIN_P,
+                                MIS_colaterales.SALDO_INS_P_ANTERIOR,
+                                MIS_colaterales.SALDO_INS_CARTERA_FIN_P,
+                                MIS_colaterales.INT_COBRADOS_PERIODO,
+                                MIS_colaterales.COMISIONES_COBRADAS_PERIODO,
+                                MIS_colaterales.NUM_MESES_MOROSOS,
+                                MIS_colaterales.MONTO_INT_DEV_NO_CUBIERTOS
+                                FROM
+                                MIS_CAT_proyectos
+                                INNER JOIN MIS_colaterales
+                                ON
+                                MIS_CAT_proyectos.NOM_PROYECTO = MIS_colaterales.NOM_PROYECTO
+                                ";
 
 
                                 if (isset($_GET['date']))
