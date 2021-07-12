@@ -252,7 +252,7 @@ function readReporteMorosidad($conn)
 
           } // END RECORRE HOJAS
 
-          $message = '<div class="alert alert-success">Información importada correctamente</div>';
+          $message = '<div class="alert alert-success">Información importada correctamente (Morosidad)</div>';
 
       }
       else
@@ -322,7 +322,7 @@ function readReporteIntProv($conn)
 
         }
 
-        $message = '<div class="alert alert-success">Información importada correctamente</div>';
+        $message = '<div class="alert alert-success">Información importada correctamente (Int y prov)</div>';
 
       }
       else

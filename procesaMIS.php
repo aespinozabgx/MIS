@@ -39,6 +39,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         //$T_intermedia    = readTablaIntermedia($conn);
 
         echo "<br><br>";
+
         /* PASO 5 */
         // $SQL = "SELECT
 
@@ -84,7 +85,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         $tsql = "SELECT
         MIS_CAT_proyectos.COLATERAL,
         MIS_CAT_proyectos.NOM_PROYECTO,
-        MIS_colaterales.FECH_COLATERAL,
+        MIS_CAT_proyectos.COLATERAL,
         MIS_CAT_proyectos.CVE_CRE_IF,
         MIS_CAT_proyectos.CVE_CRE_ID_OFERTA,
         MIS_CAT_proyectos.NUM_REF_SHF,
@@ -216,6 +217,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
               $contador++;
         }
+
 
         //echo '</tbody></table>';
 
