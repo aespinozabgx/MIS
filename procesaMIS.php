@@ -84,27 +84,37 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
         $tsql = "SELECT
         MIS_CAT_proyectos.COLATERAL,
-        MIS_CAT_proyectos.NOM_PROYECTO,
-        MIS_CAT_proyectos.COLATERAL,
         MIS_CAT_proyectos.CVE_CRE_IF,
         MIS_CAT_proyectos.CVE_CRE_ID_OFERTA,
         MIS_CAT_proyectos.NUM_REF_SHF,
+        MIS_CAT_proyectos.NOM_PROYECTO,
         MIS_CAT_proyectos.NOM_PROMOTOR,
         MIS_CAT_proyectos.TIPO_CREDITO,
         MIS_CAT_proyectos.UBICACIÓN_EDO,
         MIS_CAT_proyectos.UBICACIÓN_MUN,
         MIS_CAT_proyectos.FECH_INI_CONTRATO,
+        MIS_temp_shf.FECH_FIN_CONTRATO,
         MIS_CAT_proyectos.LINEA_DE_CRE_POR_PROYECTO,
         MIS_CAT_proyectos.VALOR_PROYECTO,
+        MIS_temp_shf.AO_VIV_ACTIVAS,
         MIS_CAT_proyectos.TASA_INTERES,
         MIS_CAT_proyectos.VIV_TOTALES_PROYECTO,
-        MIS_temp_shf.FECH_FIN_CONTRATO,
-        MIS_temp_shf.AO_VIV_ACTIVAS,
+        /* Viviendas Liberadas al Corte Anterior  */
         MIS_temp_shf.VIV_LIB_PERIODO,
+        /* acum viv lib a fin periodo */
+        /* monto min acum periodo ant */
         MIS_temp_shf.MONTO_MIN_EN_EL_PERIODO,
+        /* monto min acum fin periodo */
+        /* monto por disponer */
+        /* monto amort acum periodo ant */
         MIS_temp_shf.MONTO_AMORT_EN_EL_PERIODO,
-        MIS_temp_morosidad.INT_DEVENGADO AS REP_MOR_INTERESES,
-        MIS_temp_intprov.INTERESES AS REP_INTPROV_INTERESES_DEV_NO_CUBIERTOS
+        /* monto amort acum fin periodo */
+        /* saldo ins periodo ant */
+        /* saldo ins cartera fin periodo */
+        MIS_temp_intprov.INTERESES AS REP_INTPROV_INTERESES_DEV_NO_CUBIERTOS,
+        /* comisiones cobradas */
+        /* meses morosos */
+        MIS_temp_morosidad.INT_DEVENGADO AS REP_MOR_INTERESES
         FROM MIS_temp_morosidad
         INNER JOIN MIS_TABLA_INTERMEDIA ON MIS_TABLA_INTERMEDIA.DOS = MIS_temp_morosidad.PROYECTO
         INNER JOIN MIS_temp_intprov ON MIS_temp_intprov.PROYECTO = MIS_TABLA_INTERMEDIA.DOS
