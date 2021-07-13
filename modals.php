@@ -51,7 +51,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1"><i class="far fa-calendar-alt"></i></span>
                   </div>
-                  <input type="text" class="form-control" pattern="" name="daterange" required readonly>
+                  <input type="date" class="form-control" pattern="" name="toUpdate" required>
                 </div>
 
               </div>
