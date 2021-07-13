@@ -8,7 +8,7 @@
 
 
 
- 
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -63,7 +63,7 @@
         <?php
           if (file_exists("navbar.php"))
           {
-            //require 'navbar.php';
+            require 'navbar.php';
           }
         ?>
 
