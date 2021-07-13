@@ -16,8 +16,20 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
     if (isset($_POST['cargaDatos']))
     {
+        $mesActualziar = $_POST['daterange'];
+        $mesActualizarDate = "01-" . $_POST['daterange'];
+        $mesActualziar=explode('-',$mesActualziar);
+        $mes = (int)$mesActualziar[0] + 0;
+        $mes -= 1;
+        $mesPrevio = $mes;
+        $mesPrevio = "01-" . sprintf("%02d", $mesPrevio) . "-" . $mesActualziar[1];
+        $mesPrevio = date("d-m-Y",strtotime($mesPrevio));
 
-        echo "<br><h3>Month to update: " .  $_POST['daterange'] . "</h3><br>";
+        echo "<br>Month to update: " .  $mesActualizarDate . "<br>";
+        echo "<br>Previous Month: " .  $mesPrevio . "<br>";
+
+
+
 
         // STAR OF REPORT MATRIZ
 
@@ -240,36 +252,71 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         /* Prepare and execute the query. */
         $stmt = sqlsrv_query($conn, $tsql, $params);
         if ($stmt) {
-            echo "Tablas temporales vacías.\n";
+            echo "Tablas temporales vacías.<br>";
         } else {
-            echo "Error al vaciar tablas temporales.\n";
+            echo "Error al vaciar tablas temporales.<br>";
             die(print_r(sqlsrv_errors(), true));
         }
 
 
 
+        /* Recorro cada proyecto en busca de la información del mes anterior */
+        $tsql = "SELECT
+            MIS_CAT_proyectos.CVE_CRE_IF,
+            MIS_CAT_proyectos.CVE_CRE_ID_OFERTA,
+            MIS_CAT_proyectos.NOM_PROYECTO,
+            MIS_CAT_proyectos.NUM_REF_SHF,
+            MIS_CAT_proyectos.NOM_PROMOTOR,
+            MIS_CAT_proyectos.TIPO_CREDITO,
+            MIS_CAT_proyectos.UBICACIÓN_EDO,
+            MIS_CAT_proyectos.UBICACIÓN_MUN,
+            MIS_CAT_proyectos.FECH_INI_CONTRATO,
+            MIS_CAT_proyectos.LINEA_DE_CRE_POR_PROYECTO,
+            MIS_CAT_proyectos.VALOR_PROYECTO,
+            MIS_CAT_proyectos.TASA_INTERES,
+            MIS_CAT_proyectos.VIV_TOTALES_PROYECTO,
+            MIS_CAT_proyectos.COLATERAL,
+            MIS_colaterales.NOM_PROYECTO,
+            MIS_colaterales.FECH_COLATERAL,
+            MIS_colaterales.FECH_FIN_CONTRATO,
+            MIS_colaterales.AO_VIV_ACTIVAS,
+            MIS_colaterales.VIV_LIB_CORTE_ANTERIOR,
+            MIS_colaterales.VIV_LIB_PERIODO,
+            MIS_colaterales.ACUM_VIV_LIB_FIN_P,
+            MIS_colaterales.MONTO_MIN_ACUM_P_ANTERIOR,
+            MIS_colaterales.MONTO_MIN_PERIODO,
+            MIS_colaterales.MONTO_MIN_ACUM_FIN_P,
+            MIS_colaterales.MONTO_POR_DISPONER,
+            MIS_colaterales.MONTO_AMORT_ACUM_P_ANTERIOR,
+            MIS_colaterales.MONTO_AMORTIZADO_PERIODO,
+            MIS_colaterales.MONTO_AMORT_ACUM_FIN_P,
+            MIS_colaterales.SALDO_INS_P_ANTERIOR,
+            MIS_colaterales.SALDO_INS_CARTERA_FIN_P,
+            MIS_colaterales.INT_COBRADOS_PERIODO,
+            MIS_colaterales.COMISIONES_COBRADAS_PERIODO,
+            MIS_colaterales.NUM_MESES_MOROSOS,
+            MIS_colaterales.MONTO_INT_DEV_NO_CUBIERTOS
+            FROM
+            MIS_CAT_proyectos
+            INNER JOIN MIS_colaterales
+            ON
+            MIS_CAT_proyectos.NOM_PROYECTO = MIS_colaterales.NOM_PROYECTO
+            WHERE MIS_colaterales.FECH_COLATERAL = $mesPrevio";
+        $stmt = sqlsrv_query( $conn, $tsql);
+        if( $stmt === false)
+        {
+             echo "Error in query preparation/execution.\n";
+             die( print_r( sqlsrv_errors(), true));
+        }
 
-        // $FINALRESULT = [
-        // ['A', 1, 'Too High'],
-        // ['AB', 7, 'OK'],
-        // ['B', 10, 'Too High'],
-        // ];
-        //
-        // $all_values = [];
-        // $query = "INSERT INTO tempresult VALUES ";
-        //
-        // foreach($FINALRESULT as $key) {
-        //     $row_values = [];
-        //     foreach($key as $s_key => $s_value) {
-        //         $row_values[] = '"'.$s_value.'"';
-        //     }
-        //     $all_values[] = '('.implode(',', $row_values).')';
-        // }
-        //
-        // //Implode all rows
-        // $query .= implode(',', $all_values);
-        //
-        // echo $query;
+        /* Retrieve each row as an associative array and display the results.*/
+        while( $row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC))
+        {
+            echo $row['FECH_COLATERAL'] . ", " . $row['MONTO_AMORT_ACUM_P_ANTERIOR'] . "<br>";
+        }
+
+
+        die("here");
 
         echo "<pre>";
         print_r($matriz);
