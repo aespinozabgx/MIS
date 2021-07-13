@@ -16,20 +16,60 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
     if (isset($_POST['cargaDatos']))
     {
-        $mesActualziar = $_POST['daterange'];
-        $mesActualizarDate = "01-" . $_POST['daterange'];
-        $mesActualziar=explode('-',$mesActualziar);
-        $mes = (int)$mesActualziar[0] + 0;
+        $mesActualziar = $_POST['toUpdate'];
+        $mesActualziar = date("Y-m-d",strtotime($mesActualziar));
+
+
+        $fechaPorciones = explode(' ',$mesActualziar);
+        $onlyDate = $fechaPorciones[0];
+        $onlyDate = explode('-',$mesActualziar);
+        $mes = $onlyDate[1];
         $mes -= 1;
-        $mesPrevio = $mes;
-        $mesPrevio = "01-" . sprintf("%02d", $mesPrevio) . "-" . $mesActualziar[1];
-        $mesPrevio = date("d-m-Y",strtotime($mesPrevio));
 
-        echo "<br>Month to update: " .  $mesActualizarDate . "<br>";
-        echo "<br>Previous Month: " .  $mesPrevio . "<br>";
+        $monthNum = $mes;
+        $dateObj = DateTime::createFromFormat('!m', $monthNum);
+        $monthName = $dateObj->format('m');
+        $preMonth = $onlyDate[0] . "-" . $monthName. "-" . $onlyDate[2];
+
+        echo "<br>Month to update: " .  $mesActualziar . "<br>";
+        echo "<br>Prev month: " . $preMonth . "<br>";
+
+        /* Recorro cada proyecto en busca de la información del mes anterior */
+        $tsql = "EXEC MIS_obtieneMesPrevio ?";
 
 
 
+        $params = Array($preMonth);
+        $stmt = sqlsrv_query( $conn, $tsql, $params);
+        if( $stmt === false)
+        {
+             echo "Error in query preparation/execution.<br>";
+             die( print_r( sqlsrv_errors(), true));
+        }
+
+        /* Retrieve each row as an associative array and display the results.*/
+        $c = 0;
+        while( $row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC))
+        {
+
+              echo "FECH_COLATERAL: " . date_format($row['FECH_COLATERAL'], "d-m-Y") . "<br>";
+              echo "COLATERAL: " . $row['COLATERAL'] . "<br>";
+              echo "VIV_LIB_CORTE_ANTERIOR: " . $row['VIV_LIB_CORTE_ANTERIOR'] . "<br>";
+              echo "ACUM_VIV_LIB_FIN_P: " . $row['ACUM_VIV_LIB_FIN_P'] . "<br>";
+              echo "MONTO_MIN_ACUM_P_ANTERIOR: " . $row['MONTO_MIN_ACUM_P_ANTERIOR'] . "<br>";
+              echo "MONTO_MIN_ACUM_FIN_P: " . $row['MONTO_MIN_ACUM_FIN_P'] . "<br>";
+              echo "MONTO_POR_DISPONER: " . $row['MONTO_POR_DISPONER'] . "<br>";
+              echo "MONTO_AMORT_ACUM_P_ANTERIOR: " . $row['MONTO_AMORT_ACUM_P_ANTERIOR'] . "<br>";
+              echo "MONTO_AMORT_ACUM_FIN_P: " . $row['MONTO_AMORT_ACUM_FIN_P'] . "<br>";
+              echo "SALDO_INS_P_ANTERIOR: " . $row['SALDO_INS_P_ANTERIOR'] . "<br>";
+              echo "SALDO_INS_CARTERA_FIN_P: " . $row['SALDO_INS_CARTERA_FIN_P'] . "<br>";
+              echo "COMISIONES_COBRADAS_PERIODO: " . $row['COMISIONES_COBRADAS_PERIODO'] . "<br>";
+              echo "NUM_MESES_MOROSOS: " . $row['NUM_MESES_MOROSOS'] . "<br>";
+              echo "<br>";
+              $c++;
+        }
+        echo "C:" . $c ;
+        die;
 
         // STAR OF REPORT MATRIZ
 
@@ -51,48 +91,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         //$T_intermedia    = readTablaIntermedia($conn);
 
         echo "<br><br>";
-
-        /* PASO 5 */
-        // $SQL = "SELECT
-
-          // MIS_CAT_proyectos.COLATERAL,
-          // MIS_colaterales.NOM_PROYECTO,
-          // MIS_colaterales.FECH_COLATERAL,
-          // MIS_CAT_proyectos.CVE_CRE_IF,
-          // MIS_CAT_proyectos.CVE_CRE_ID_OFERTA,
-          // MIS_CAT_proyectos.NOM_PROYECTO,
-          // MIS_CAT_proyectos.NUM_REF_SHF,
-          // MIS_CAT_proyectos.NOM_PROMOTOR,
-          // MIS_CAT_proyectos.TIPO_CREDITO,
-          // MIS_CAT_proyectos.UBICACIÓN_EDO,
-          // MIS_CAT_proyectos.UBICACIÓN_MUN,
-          // MIS_CAT_proyectos.FECH_INI_CONTRATO,
-          // MIS_CAT_proyectos.LINEA_DE_CRE_POR_PROYECTO,
-          // MIS_CAT_proyectos.VALOR_PROYECTO,
-          // MIS_CAT_proyectos.TASA_INTERES,
-          // MIS_CAT_proyectos.VIV_TOTALES_PROYECTO,
-          //
-          // MIS_colaterales.FECH_FIN_CONTRATO,
-          // MIS_colaterales.AO_VIV_ACTIVAS,
-          // MIS_colaterales.VIV_LIB_PERIODO,
-          // MIS_colaterales.MONTO_MIN_PERIODO,
-          // MIS_colaterales.MONTO_AMORTIZADO_PERIODO,
-          //
-          // MIS_colaterales.MONTO_AMORT_ACUM_FIN_P,
-          // MIS_colaterales.ACUM_VIV_LIB_FIN_P,
-          // MIS_colaterales.MONTO_MIN_ACUM_FIN_P,
-          // MIS_colaterales.MONTO_POR_DISPONER,
-          // MIS_colaterales.SALDO_INS_CARTERA_FIN_P,
-          // MIS_colaterales.VIV_LIB_CORTE_ANTERIOR,
-          // MIS_colaterales.MONTO_AMORT_ACUM_P_ANTERIOR,
-          // MIS_colaterales.SALDO_INS_P_ANTERIOR,
-          // MIS_colaterales.MONTO_MIN_ACUM_P_ANTERIOR,
-          // MIS_colaterales.INT_COBRADOS_PERIODO,
-          // MIS_colaterales.NUM_MESES_MOROSOS,
-          // MIS_colaterales.MONTO_INT_DEV_NO_CUBIERTOS
-          // FROM MIS_CAT_proyectos INNER JOIN MIS_colaterales ON MIS_CAT_proyectos.NOM_PROYECTO = MIS_colaterales.NOM_PROYECTO";
-
-          /* ===================================== */
 
         $tsql = "SELECT
         MIS_CAT_proyectos.COLATERAL,
@@ -140,79 +138,11 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
              die( print_r( sqlsrv_errors(), true));
         }
 
-        /* Retrieve each row as an associative array and display the results.*/
-
-        //echo "
-        // <table class=\"table table-bordered text-dark\" id=\"dataTable\" width=\"100%\" cellspacing=\"0\"  data-order='[[ 2, \"desc\" ]]' data-page-length='25'>
-        // <thead>
-        //   <tr>
-        //     <th>#</th>
-        //     <th>CVE_CRED_IF</th>
-        //     <th>CVE_CRED_ID_OFERTA</th>
-        //     <th>NUM_REF_SHF</th>
-        //     <th>NOM_CONJUNTO</th>
-        //     <th>NOM_PROMOTOR</th>
-        //     <th>TIPO_CREDITO</th>
-        //     <th>UBICACION_ESTADO</th>
-        //     <th>UBICACION_MUNICIPIO</th>
-        //     <th>FECH_INI_CONTRATO</th>
-        //     <th>LINEA_DE_CREDITO_POR_PROYECTO</th>
-        //     <th>VALOR_PROYECTO</th>
-        //     <th>TASA_INTERES</th>
-        //     <th>VIVIENDAS_TOTALES_DEL_PROYECTO</th>
-        //     <th>PROYECTO AS PROYECTO_MAY</th>
-        //     <th>UNO AS PROYECTO_MIN</th>
-        //     <th>INT_DEVENGADO AS REP_MOR_INTERESES</th>
-        //     <th>INTERESES AS REP_INTPROV_INTERESES</th>
-        //   </tr>
-        // </thead>
-        // <tfoot>
-        //   <tr>
-        //     <th>#</th>
-        //     <th>CVE_CRED_IF</th>
-        //     <th>CVE_CRED_ID_OFERTA</th>
-        //     <th>NUM_REF_SHF</th>
-        //     <th>NOM_CONJUNTO</th>
-        //     <th>NOM_PROMOTOR</th>
-        //     <th>TIPO_CREDITO</th>
-        //     <th>UBICACION_ESTADO</th>
-        //     <th>UBICACION_MUNICIPIO</th>
-        //     <th>FECH_INI_CONTRATO</th>
-        //     <th>LINEA_DE_CREDITO_POR_PROYECTO</th>
-        //     <th>VALOR_PROYECTO</th>
-        //     <th>TASA_INTERES</th>
-        //     <th>VIVIENDAS_TOTALES_DEL_PROYECTO</th>
-        //     <th>PROYECTO AS PROYECTO_MAY</th>
-        //     <th>UNO AS PROYECTO_MIN</th>
-        //     <th>INT_DEVENGADO AS REP_MOR_INTERESES</th>
-        //     <th>INTERESES AS REP_INTPROV_INTERESES</th>
-        //   </tr>
-        // </tfoot>
-        // <tbody>";
 
         $contador = 0;
         while( $row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_NUMERIC))
         {
-              // echo "<tr>";
-              // echo "<td>" . $contador . "</td>";
-              // echo "<td>" . $row['0'] . "</td>";
-              // echo "<td>" . $row['1'] . "</td>";
-              // echo "<td>" . $row['2'] . "</td>";
-              // echo "<td>" . $row['3'] . "</td>";
-              // echo "<td>" . $row['4'] . "</td>";
-              // echo "<td>" . $row['5'] . "</td>";
-              // echo "<td>" . $row['6'] . "</td>";
-              // echo "<td>" . $row['7'] . "</td>";
-              // echo "<td>" . date_format($row['8'], "d-m-Y") . "</td>";
-              // echo "<td>" . $row['9'] . "</td>";
-              // echo "<td>" . $row['10'] . "</td>";
-              // echo "<td>" . $row['11'] . "</td>";
-              // echo "<td>" . $row['12'] . "</td>";
-              // echo "<td>" . $row['13'] . "</td>";
-              // echo "<td>" . $row['14'] . "</td>";
-              // echo "<td>" . $row['15'] . "</td>";
-              // echo "<td>" . $row['16'] . "</td>";
-              // echo "</tr>";
+
               $matriz[$contador][0]  = $row['0'];
               $matriz[$contador][1]  = $row['1'];
               $matriz[$contador][2]  = $row['2'];
@@ -238,6 +168,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
               $matriz[$contador][20] = $row['20'];
 
               $contador++;
+
         }
 
 
@@ -260,60 +191,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
 
-        /* Recorro cada proyecto en busca de la información del mes anterior */
-        $tsql = "SELECT
-            MIS_CAT_proyectos.CVE_CRE_IF,
-            MIS_CAT_proyectos.CVE_CRE_ID_OFERTA,
-            MIS_CAT_proyectos.NOM_PROYECTO,
-            MIS_CAT_proyectos.NUM_REF_SHF,
-            MIS_CAT_proyectos.NOM_PROMOTOR,
-            MIS_CAT_proyectos.TIPO_CREDITO,
-            MIS_CAT_proyectos.UBICACIÓN_EDO,
-            MIS_CAT_proyectos.UBICACIÓN_MUN,
-            MIS_CAT_proyectos.FECH_INI_CONTRATO,
-            MIS_CAT_proyectos.LINEA_DE_CRE_POR_PROYECTO,
-            MIS_CAT_proyectos.VALOR_PROYECTO,
-            MIS_CAT_proyectos.TASA_INTERES,
-            MIS_CAT_proyectos.VIV_TOTALES_PROYECTO,
-            MIS_CAT_proyectos.COLATERAL,
-            MIS_colaterales.NOM_PROYECTO,
-            MIS_colaterales.FECH_COLATERAL,
-            MIS_colaterales.FECH_FIN_CONTRATO,
-            MIS_colaterales.AO_VIV_ACTIVAS,
-            MIS_colaterales.VIV_LIB_CORTE_ANTERIOR,
-            MIS_colaterales.VIV_LIB_PERIODO,
-            MIS_colaterales.ACUM_VIV_LIB_FIN_P,
-            MIS_colaterales.MONTO_MIN_ACUM_P_ANTERIOR,
-            MIS_colaterales.MONTO_MIN_PERIODO,
-            MIS_colaterales.MONTO_MIN_ACUM_FIN_P,
-            MIS_colaterales.MONTO_POR_DISPONER,
-            MIS_colaterales.MONTO_AMORT_ACUM_P_ANTERIOR,
-            MIS_colaterales.MONTO_AMORTIZADO_PERIODO,
-            MIS_colaterales.MONTO_AMORT_ACUM_FIN_P,
-            MIS_colaterales.SALDO_INS_P_ANTERIOR,
-            MIS_colaterales.SALDO_INS_CARTERA_FIN_P,
-            MIS_colaterales.INT_COBRADOS_PERIODO,
-            MIS_colaterales.COMISIONES_COBRADAS_PERIODO,
-            MIS_colaterales.NUM_MESES_MOROSOS,
-            MIS_colaterales.MONTO_INT_DEV_NO_CUBIERTOS
-            FROM
-            MIS_CAT_proyectos
-            INNER JOIN MIS_colaterales
-            ON
-            MIS_CAT_proyectos.NOM_PROYECTO = MIS_colaterales.NOM_PROYECTO
-            WHERE MIS_colaterales.FECH_COLATERAL = $mesPrevio";
-        $stmt = sqlsrv_query( $conn, $tsql);
-        if( $stmt === false)
-        {
-             echo "Error in query preparation/execution.\n";
-             die( print_r( sqlsrv_errors(), true));
-        }
 
-        /* Retrieve each row as an associative array and display the results.*/
-        while( $row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC))
-        {
-            echo $row['FECH_COLATERAL'] . ", " . $row['MONTO_AMORT_ACUM_P_ANTERIOR'] . "<br>";
-        }
 
 
         die("here");
