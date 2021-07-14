@@ -360,7 +360,7 @@ function readReporteIntProv($conn)
     foreach ($matrizRepIntProv as $vals)
     {
         //echo "Eval: " . $vals['9']["B"] . "<br>";
-        if (isset($vals['9']["B"]) && date('m-Y', strtotime($vals['9']["B"])) == $_POST['daterange'])
+        if (isset($vals['9']["B"]) && date('m-Y', strtotime($vals['9']["B"])) == $_POST['toUpdate'])
         {
 
           //echo "SI: " . date('m-Y', strtotime($vals['9']["B"])) . " - " . $_POST['daterange'] . "<br>";

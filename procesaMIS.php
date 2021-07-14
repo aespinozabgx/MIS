@@ -36,9 +36,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
         /* Recorro cada proyecto en busca de la información del mes anterior */
         $tsql = "EXEC MIS_obtieneMesPrevio ?";
-
-
-
         $params = Array($preMonth);
         $stmt = sqlsrv_query( $conn, $tsql, $params);
         if( $stmt === false)
@@ -49,27 +46,25 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
         /* Retrieve each row as an associative array and display the results.*/
         $c = 0;
+        $datosMesPrevio = Array();
         while( $row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC))
         {
-
-              echo "FECH_COLATERAL: " . date_format($row['FECH_COLATERAL'], "d-m-Y") . "<br>";
-              echo "COLATERAL: " . $row['COLATERAL'] . "<br>";
-              echo "VIV_LIB_CORTE_ANTERIOR: " . $row['VIV_LIB_CORTE_ANTERIOR'] . "<br>";
-              echo "ACUM_VIV_LIB_FIN_P: " . $row['ACUM_VIV_LIB_FIN_P'] . "<br>";
-              echo "MONTO_MIN_ACUM_P_ANTERIOR: " . $row['MONTO_MIN_ACUM_P_ANTERIOR'] . "<br>";
-              echo "MONTO_MIN_ACUM_FIN_P: " . $row['MONTO_MIN_ACUM_FIN_P'] . "<br>";
-              echo "MONTO_POR_DISPONER: " . $row['MONTO_POR_DISPONER'] . "<br>";
-              echo "MONTO_AMORT_ACUM_P_ANTERIOR: " . $row['MONTO_AMORT_ACUM_P_ANTERIOR'] . "<br>";
-              echo "MONTO_AMORT_ACUM_FIN_P: " . $row['MONTO_AMORT_ACUM_FIN_P'] . "<br>";
-              echo "SALDO_INS_P_ANTERIOR: " . $row['SALDO_INS_P_ANTERIOR'] . "<br>";
-              echo "SALDO_INS_CARTERA_FIN_P: " . $row['SALDO_INS_CARTERA_FIN_P'] . "<br>";
-              echo "COMISIONES_COBRADAS_PERIODO: " . $row['COMISIONES_COBRADAS_PERIODO'] . "<br>";
-              echo "NUM_MESES_MOROSOS: " . $row['NUM_MESES_MOROSOS'] . "<br>";
-              echo "<br>";
+              $datosMesPrevio[$c][0]  = $row['NOM_PROYECTO'];
+              $datosMesPrevio[$c][1]  = date_format($row['FECH_COLATERAL'], "d-m-Y");
+              $datosMesPrevio[$c][2]  = $row['COLATERAL'];
+              $datosMesPrevio[$c][3]  = $row['VIV_LIB_CORTE_ANTERIOR'];
+              $datosMesPrevio[$c][4]  = $row['ACUM_VIV_LIB_FIN_P'];
+              $datosMesPrevio[$c][5]  = $row['MONTO_MIN_ACUM_P_ANTERIOR'];
+              $datosMesPrevio[$c][6]  = $row['MONTO_MIN_ACUM_FIN_P'];
+              $datosMesPrevio[$c][7]  = $row['MONTO_POR_DISPONER'];
+              $datosMesPrevio[$c][8]  = $row['MONTO_AMORT_ACUM_P_ANTERIOR'];
+              $datosMesPrevio[$c][9]  = $row['MONTO_AMORT_ACUM_FIN_P'];
+              $datosMesPrevio[$c][10] = $row['SALDO_INS_P_ANTERIOR'];
+              $datosMesPrevio[$c][11] = $row['SALDO_INS_CARTERA_FIN_P'];
+              $datosMesPrevio[$c][12] = $row['COMISIONES_COBRADAS_PERIODO'];
+              $datosMesPrevio[$c][13] = $row['NUM_MESES_MOROSOS'];
               $c++;
         }
-        echo "C:" . $c ;
-        die;
 
         // STAR OF REPORT MATRIZ
 
@@ -194,12 +189,13 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
 
-        die("here");
+
 
         echo "<pre>";
-        print_r($matriz);
+        print_r($datosMesPrevio);
         echo "</pre>";
-        die("Terminado");
+
+        die("<br><br>Terminado");
 
         $titulos = Array("CVE_CRED_IF", "CVE_CRED_ID_OFERTA", "NUM_REF_SHF", "NOM_CONJUNTO", "NOM_PROMOTOR", "TIPO_CREDITO", "UBICACION_ESTADO", "UBICACION_MUNICIPIO", "FECH_INI_CONTRATO", "LINEA_DE_CREDITO_POR_PROYECTO", "VALOR_PROYECTO", "TASA_INTERES", "VIVIENDAS_TOTALES_DEL_PROYECTO", "FECH_FIN_CONTRATO", "AO_VIV_ACTIVAS", "VIV_LIB_PERIODO", "MONTO_MIN_EN_EL_PERIODO", "MONTO_AMORT_EN_EL_PERIODO", "PROYECTO_MAY", "PROYECTO_MIN", "REP_MOR_INTERESES", "REP_INTPROV_INTERESES");
         $spreadsheet = new Spreadsheet();
