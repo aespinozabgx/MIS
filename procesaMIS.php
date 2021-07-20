@@ -215,8 +215,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
             {
                 if ($datosMesPrevio[$i]['NOM_PROYECTO'] == $matriz[$cont]['NOM_PROYECTO'])
                 {
-                  echo "<hr><br>";
-                    echo $cont . ". Encontrado: " . $datosMesPrevio[$i]['NOM_PROYECTO'] . " - " . $matriz[$cont]['NOM_PROYECTO'] . "<br><br>";
+                    //echo "<hr><br>";
+                    //echo $cont . ". Encontrado: " . $datosMesPrevio[$i]['NOM_PROYECTO'] . " - " . $matriz[$cont]['NOM_PROYECTO'] . "<br><br>";
 
                     echo $mesActualziar;
                     echo $matriz[$cont]['COLATERAL'];
@@ -229,39 +229,38 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
                     echo $matriz[$cont]['UBICACIÓN_EDO'];
                     echo $matriz[$cont]['UBICACIÓN_MUN'];
                     echo date_format($matriz[$cont]['FECH_INI_CONTRATO'], "d-m-Y");
-                    echo $matriz[$cont]['LINEA_DE_CRE_POR_PROYECTO'];
-                    echo $matriz[$cont]['VALOR_PROYECTO'];
+                    echo number_format($matriz[$cont]['LINEA_DE_CRE_POR_PROYECTO'], 2);
+                    echo number_format($matriz[$cont]['VALOR_PROYECTO']);
                     echo $matriz[$cont]['TASA_INTERES'];
                     echo $matriz[$cont]['VIV_TOTALES_PROYECTO'];
                     echo date_format($matriz[$cont]['FECH_FIN_CONTRATO'], "d-m-Y");
                     echo $matriz[$cont]['AO_VIV_ACTIVAS'];
                     echo $matriz[$cont]['VIV_LIB_PERIODO'];
-                    echo $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO'];
-                    echo $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO'];
+                    echo number_format($matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']);
+                    echo number_format($matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']);
 
                     /* SUMA DE COLUMNAS */
-                    echo ($datosMesPrevio[$i]['MONTO_AMORT_ACUM_P_ANTERIOR'] + $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']);
-                    echo ($datosMesPrevio[$i]['VIV_LIB_CORTE_ANTERIOR']      + $matriz[$cont]['VIV_LIB_PERIODO']);
-                    echo ($datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR']   + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']);
-                    echo ($datosMesPrevio[$i]['MONTO_MIN_ACUM_FIN_P']        + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']);
-                    echo (($matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']         - $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']) + $datosMesPrevio[$i]['SALDO_INS_P_ANTERIOR']);
+                    echo number_format(($datosMesPrevio[$i]['MONTO_AMORT_ACUM_P_ANTERIOR'] + $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']));
+                    echo ($datosMesPrevio[$i]['VIV_LIB_CORTE_ANTERIOR']                    + $matriz[$cont]['VIV_LIB_PERIODO']);
+                    echo number_format(($datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR']   + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']));
+                    echo number_format(($datosMesPrevio[$i]['MONTO_MIN_ACUM_FIN_P']        + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']));
+                    echo number_format((($matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']         - $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']) + $datosMesPrevio[$i]['SALDO_INS_P_ANTERIOR']));
                     /* FIN SUMA DE COLUMNAS */
 
                     echo $datosMesPrevio[$i]['VIV_LIB_CORTE_ANTERIOR'];
-                    echo $datosMesPrevio[$i]['MONTO_AMORT_ACUM_FIN_P'];
-                    echo $datosMesPrevio[$i]['SALDO_INS_CARTERA_FIN_P'];
-                    echo $datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR'];
-                    echo $matriz[$cont]['INTERESES_COBRADOS_PERIODO'];
+                    echo number_format($datosMesPrevio[$i]['MONTO_AMORT_ACUM_FIN_P']);
+                    echo number_format($datosMesPrevio[$i]['SALDO_INS_CARTERA_FIN_P']);
+                    echo number_format($datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR']);
+                    echo number_format($matriz[$cont]['INTERESES_COBRADOS_PERIODO']);
                     echo $datosMesPrevio[$i]['NUM_MESES_MOROSOS'];
-                    echo $matriz[$cont]['INTERESES_DEV_NO_CUBIERTOS'];
+                    echo number_format($matriz[$cont]['INTERESES_DEV_NO_CUBIERTOS']) ;
 
                     // echo "<br><b>NOM_PROYECTO:</b> " . $datosMesPrevio[$i]['NOM_PROYECTO'];
                     // echo "<br><b>FECH_COLATERAL:</b> " . "Fecha: " . $datosMesPrevio[$i]['FECH_COLATERAL'];
                     // echo "<br><b>MONTO_POR_DISPONER:</b> " . $datosMesPrevio[$i]['MONTO_POR_DISPONER'];
                     // echo "<br><b>ACUM_VIV_LIB_FIN_P:</b> " . $datosMesPrevio[$i]['ACUM_VIV_LIB_FIN_P'];
                     // echo "<br><b>COMISIONES_COBRADAS_PERIODO:</b> " . $datosMesPrevio[$i]['COMISIONES_COBRADAS_PERIODO'];
-
-                    echo " <br><br> ";
+                    //echo " <br><br> ";
 
                 }
             }
