@@ -1,5 +1,30 @@
 <?php
 
+function validaCargaColateral($conn, $mesActualziar)
+{
+    // Esta madre revisa si existe información previa cargada del mes que se intenta actualizar
+
+    /* Obtener mes */
+    $fechaPorciones = explode(' ',$mesActualziar);
+    $onlyDate = $fechaPorciones[0];
+    $onlyDate = explode('-',$mesActualziar);
+    $mes = $onlyDate[1];
+    /* Fin obtener mes */
+
+
+    $tsql = "SELECT * FROM MIS_colaterales WHERE datepart(month, FECH_COLATERAL)= ?";
+    $params = array($mes);
+    $stmt = sqlsrv_query($conn, $tsql, $params, array("Scrollable" => SQLSRV_CURSOR_KEYSET));
+
+    $row_count = sqlsrv_num_rows( $stmt );
+
+    if ($row_count === false)
+       return false;
+    else if ($row_count >0)
+       return true;
+
+}
+
 function fechaCastellano($fecha)
 {
   $fecha = substr($fecha, 0, 10);

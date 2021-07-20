@@ -2,7 +2,6 @@
 
 require 'vendor/autoload.php';
 require 'php/funciones.php';
-
 require 'php/conexion.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -19,52 +18,28 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         $mesActualziar = $_POST['toUpdate'];
         $mesActualziar = date("Y-m-d",strtotime($mesActualziar));
 
+        if (validaCargaColateral($conn, $mesActualziar))
+        {
+          die("Ya existen datos cargados");
+        }
 
-        $fechaPorciones = explode(' ',$mesActualziar);
+        $fechaPorciones = explode(' ', $mesActualziar);
         $onlyDate = $fechaPorciones[0];
         $onlyDate = explode('-',$mesActualziar);
         $mes = $onlyDate[1];
         $mes -= 1;
 
+
         $monthNum = $mes;
         $dateObj = DateTime::createFromFormat('!m', $monthNum);
         $monthName = $dateObj->format('m');
-        $preMonth = $onlyDate[0] . "-" . $monthName. "-" . $onlyDate[2];
+        $preMonth = $onlyDate[0] . "-" . $monthName. "-01";
 
         echo "<br>Month to update: " .  $mesActualziar . "<br>";
         echo "<br>Prev month: " . $preMonth . "<br>";
 
-        /* Recorro cada proyecto en busca de la información del mes anterior */
-        $tsql = "EXEC MIS_obtieneMesPrevio ?";
-        $params = Array($preMonth);
-        $stmt = sqlsrv_query( $conn, $tsql, $params);
-        if( $stmt === false)
-        {
-             echo "Error in query preparation/execution.<br>";
-             die( print_r( sqlsrv_errors(), true));
-        }
 
-        /* Retrieve each row as an associative array and display the results.*/
-        $c = 0;
-        $datosMesPrevio = Array();
-        while( $row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC))
-        {
-              $datosMesPrevio[$c][0]  = $row['NOM_PROYECTO'];
-              $datosMesPrevio[$c][1]  = date_format($row['FECH_COLATERAL'], "d-m-Y");
-              $datosMesPrevio[$c][2]  = $row['COLATERAL'];
-              $datosMesPrevio[$c][3]  = $row['VIV_LIB_CORTE_ANTERIOR'];
-              $datosMesPrevio[$c][4]  = $row['ACUM_VIV_LIB_FIN_P'];
-              $datosMesPrevio[$c][5]  = $row['MONTO_MIN_ACUM_P_ANTERIOR'];
-              $datosMesPrevio[$c][6]  = $row['MONTO_MIN_ACUM_FIN_P'];
-              $datosMesPrevio[$c][7]  = $row['MONTO_POR_DISPONER'];
-              $datosMesPrevio[$c][8]  = $row['MONTO_AMORT_ACUM_P_ANTERIOR'];
-              $datosMesPrevio[$c][9]  = $row['MONTO_AMORT_ACUM_FIN_P'];
-              $datosMesPrevio[$c][10] = $row['SALDO_INS_P_ANTERIOR'];
-              $datosMesPrevio[$c][11] = $row['SALDO_INS_CARTERA_FIN_P'];
-              $datosMesPrevio[$c][12] = $row['COMISIONES_COBRADAS_PERIODO'];
-              $datosMesPrevio[$c][13] = $row['NUM_MESES_MOROSOS'];
-              $c++;
-        }
+
 
         // STAR OF REPORT MATRIZ
 
@@ -89,6 +64,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
         $tsql = "SELECT
         MIS_CAT_proyectos.COLATERAL,
+
         MIS_CAT_proyectos.CVE_CRE_IF,
         MIS_CAT_proyectos.CVE_CRE_ID_OFERTA,
         MIS_CAT_proyectos.NUM_REF_SHF,
@@ -98,28 +74,33 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         MIS_CAT_proyectos.UBICACIÓN_EDO,
         MIS_CAT_proyectos.UBICACIÓN_MUN,
         MIS_CAT_proyectos.FECH_INI_CONTRATO,
-        MIS_temp_shf.FECH_FIN_CONTRATO,
         MIS_CAT_proyectos.LINEA_DE_CRE_POR_PROYECTO,
         MIS_CAT_proyectos.VALOR_PROYECTO,
-        MIS_temp_shf.AO_VIV_ACTIVAS,
         MIS_CAT_proyectos.TASA_INTERES,
         MIS_CAT_proyectos.VIV_TOTALES_PROYECTO,
-        /* Viviendas Liberadas al Corte Anterior  */
+        MIS_temp_shf.FECH_FIN_CONTRATO,
+        MIS_temp_shf.AO_VIV_ACTIVAS,
         MIS_temp_shf.VIV_LIB_PERIODO,
-        /* acum viv lib a fin periodo */
-        /* monto min acum periodo ant */
         MIS_temp_shf.MONTO_MIN_EN_EL_PERIODO,
+        MIS_temp_shf.MONTO_AMORT_EN_EL_PERIODO,
+
+        /* monto amort acum fin periodo */
+        /* acum viv lib a fin periodo */
         /* monto min acum fin periodo */
         /* monto por disponer */
-        /* monto amort acum periodo ant */
-        MIS_temp_shf.MONTO_AMORT_EN_EL_PERIODO,
-        /* monto amort acum fin periodo */
-        /* saldo ins periodo ant */
         /* saldo ins cartera fin periodo */
-        MIS_temp_intprov.INTERESES AS REP_INTPROV_INTERESES_DEV_NO_CUBIERTOS,
+
+        /* Viviendas Liberadas al Corte Anterior  */
+        /* monto amort acum periodo ant */
+        /* saldo ins periodo ant */
+        /* monto min acum periodo ant */
+
         /* comisiones cobradas */
+        MIS_temp_intprov.INTERESES AS INTERESES_COBRADOS_PERIODO,
         /* meses morosos */
-        MIS_temp_morosidad.INT_DEVENGADO AS REP_MOR_INTERESES
+        MIS_temp_morosidad.INT_DEVENGADO AS INTERESES_DEV_NO_CUBIERTOS
+
+
         FROM MIS_temp_morosidad
         INNER JOIN MIS_TABLA_INTERMEDIA ON MIS_TABLA_INTERMEDIA.DOS = MIS_temp_morosidad.PROYECTO
         INNER JOIN MIS_temp_intprov ON MIS_temp_intprov.PROYECTO = MIS_TABLA_INTERMEDIA.DOS
@@ -135,39 +116,36 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
         $contador = 0;
-        while( $row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_NUMERIC))
+        while( $row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_BOTH))
         {
 
-              $matriz[$contador][0]  = $row['0'];
-              $matriz[$contador][1]  = $row['1'];
-              $matriz[$contador][2]  = $row['2'];
-              $matriz[$contador][3]  = $row['3'];
-              $matriz[$contador][4]  = $row['4'];
-              $matriz[$contador][5]  = $row['5'];
-              $matriz[$contador][6]  = $row['6'];
-              $matriz[$contador][7]  = $row['7'];
-              $matriz[$contador][8]  = $row['8'];
-              $matriz[$contador][9]  = $row['9'];
-              $matriz[$contador][10] = $row['10'];
-              $matriz[$contador][11] = $row['11'];
-              $matriz[$contador][12] = $row['12'];
-              $matriz[$contador][13] = $row['13'];
-              $matriz[$contador][14] = $row['14'];
-              $matriz[$contador][15] = $row['15'];
-              $matriz[$contador][16] = $row['16'];
+              $matriz[$contador]['COLATERAL']                      = $row['COLATERAL'];
+              $matriz[$contador]['CVE_CRE_IF']                     = $row['CVE_CRE_IF'];
+              $matriz[$contador]['CVE_CRE_ID_OFERTA']              = $row['CVE_CRE_ID_OFERTA'];
+              $matriz[$contador]['NUM_REF_SHF']                    = $row['NUM_REF_SHF'];
+              $matriz[$contador]['NOM_PROYECTO']                   = $row['NOM_PROYECTO'];
+              $matriz[$contador]['NOM_PROMOTOR']                   = $row['NOM_PROMOTOR'];
+              $matriz[$contador]['TIPO_CREDITO']                   = $row['TIPO_CREDITO'];
+              $matriz[$contador]['UBICACIÓN_EDO']                  = $row['UBICACIÓN_EDO'];
+              $matriz[$contador]['UBICACIÓN_MUN']                  = $row['UBICACIÓN_MUN'];
+              $matriz[$contador]['FECH_INI_CONTRATO']              = $row['FECH_INI_CONTRATO'];
+              $matriz[$contador]['LINEA_DE_CRE_POR_PROYECTO']      = $row['LINEA_DE_CRE_POR_PROYECTO'];
+              $matriz[$contador]['VALOR_PROYECTO']                 = $row['VALOR_PROYECTO'];
+              $matriz[$contador]['TASA_INTERES']                   = $row['TASA_INTERES'];
+              $matriz[$contador]['VIV_TOTALES_PROYECTO']           = $row['VIV_TOTALES_PROYECTO'];
+              $matriz[$contador]['FECH_FIN_CONTRATO']              = $row['FECH_FIN_CONTRATO'];
+              $matriz[$contador]['AO_VIV_ACTIVAS']                 = $row['AO_VIV_ACTIVAS'];
+              $matriz[$contador]['VIV_LIB_PERIODO']                = $row['VIV_LIB_PERIODO'];
 
               /* shf */
-              $matriz[$contador][17] = $row['17'];
-              $matriz[$contador][18] = $row['18'];
-              $matriz[$contador][19] = $row['19'];
-              $matriz[$contador][20] = $row['20'];
+              $matriz[$contador]['MONTO_MIN_EN_EL_PERIODO']        = $row['MONTO_MIN_EN_EL_PERIODO'];
+              $matriz[$contador]['MONTO_AMORT_EN_EL_PERIODO']      = $row['MONTO_AMORT_EN_EL_PERIODO'];
+              $matriz[$contador]['INTERESES_COBRADOS_PERIODO']     = $row['INTERESES_COBRADOS_PERIODO'];
+              $matriz[$contador]['INTERESES_DEV_NO_CUBIERTOS']     = $row['INTERESES_DEV_NO_CUBIERTOS'];
 
               $contador++;
 
         }
-
-
-        //echo '</tbody></table>';
 
         /* Elimino tablas temporales */
         $tsql = "DELETE FROM MIS_temp_intprov; DELETE FROM MIS_temp_morosidad; DELETE FROM MIS_temp_shf";
@@ -177,23 +155,117 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
         /* Prepare and execute the query. */
         $stmt = sqlsrv_query($conn, $tsql, $params);
-        if ($stmt) {
+        if ($stmt)
+        {
             echo "Tablas temporales vacías.<br>";
-        } else {
+        }
+        else
+        {
             echo "Error al vaciar tablas temporales.<br>";
             die(print_r(sqlsrv_errors(), true));
         }
 
 
+        /*UNO LA INFORAMCIÓN */
+
+        $tsql = "EXEC MIS_obtieneMesPrevio ?";
+        $params = Array($preMonth);
+        $stmt = sqlsrv_query($conn, $tsql, $params);
+        if( $stmt === false)
+        {
+             echo "Error in query execution.<br>";
+             die( print_r( sqlsrv_errors(), true));
+        }
+
+        /* Retrieve each row as an associative array and display the results.*/
+        $c = 0;
+        $datosMesPrevio = Array();
+        while( $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC))
+        {
+            echo $row['NOM_PROYECTO'] . "<br>";
+            $datosMesPrevio[$c]['NOM_PROYECTO']                   = $row['NOM_PROYECTO'];
+            $datosMesPrevio[$c]['FECH_COLATERAL']                 = date_format($row['FECH_COLATERAL'], "d-m-Y");
+            $datosMesPrevio[$c]['COLATERAL']                      = $row['COLATERAL'];
+            $datosMesPrevio[$c]['VIV_LIB_CORTE_ANTERIOR']         = $row['VIV_LIB_CORTE_ANTERIOR'];
+            $datosMesPrevio[$c]['ACUM_VIV_LIB_FIN_P']             = $row['ACUM_VIV_LIB_FIN_P'];
+            $datosMesPrevio[$c]['MONTO_MIN_ACUM_P_ANTERIOR']      = $row['MONTO_MIN_ACUM_P_ANTERIOR'];
+            $datosMesPrevio[$c]['MONTO_MIN_ACUM_FIN_P']           = $row['MONTO_MIN_ACUM_FIN_P'];
+            $datosMesPrevio[$c]['MONTO_POR_DISPONER']             = $row['MONTO_POR_DISPONER'];
+            $datosMesPrevio[$c]['MONTO_AMORT_ACUM_P_ANTERIOR']    = $row['MONTO_AMORT_ACUM_P_ANTERIOR'];
+            $datosMesPrevio[$c]['MONTO_AMORT_ACUM_FIN_P']         = $row['MONTO_AMORT_ACUM_FIN_P'];
+            $datosMesPrevio[$c]['SALDO_INS_P_ANTERIOR']           = $row['SALDO_INS_P_ANTERIOR'];
+            $datosMesPrevio[$c]['SALDO_INS_CARTERA_FIN_P']        = $row['SALDO_INS_CARTERA_FIN_P'];
+            $datosMesPrevio[$c]['COMISIONES_COBRADAS_PERIODO']    = $row['COMISIONES_COBRADAS_PERIODO'];
+            $datosMesPrevio[$c]['NUM_MESES_MOROSOS']              = $row['NUM_MESES_MOROSOS'];
+            $c++;
+        }
+
+        /* FIN UNO LA INFORMACIÓN */
+        $matriz_row = count($matriz);
+        $matriz_col = max(array_map('count', $matriz));
+
+        $datosMesPrevio_row = count($matriz);
+        $datosMesPrevio_col = max(array_map('count', $matriz));
 
 
+        for ($cont=0; $cont < $matriz_row; $cont++)
+        {
+            //echo "Buscando " . $matriz[$cont][4] . "<br>";
+            for ($i=0; $i < $datosMesPrevio_row; $i++)
+            {
+                if ($datosMesPrevio[$i]['NOM_PROYECTO'] == $matriz[$cont]['NOM_PROYECTO'])
+                {
+                  echo "<hr><br>";
+                    echo $cont . ". Encontrado: " . $datosMesPrevio[$i]['NOM_PROYECTO'] . " - " . $matriz[$cont]['NOM_PROYECTO'] . "<br><br>";
 
+                    echo $mesActualziar;
+                    echo $matriz[$cont]['COLATERAL'];
+                    echo $matriz[$cont]['CVE_CRE_IF'];
+                    echo $matriz[$cont]['CVE_CRE_ID_OFERTA'];
+                    echo $matriz[$cont]['NUM_REF_SHF'];
+                    echo $matriz[$cont]['NOM_PROYECTO'];
+                    echo $matriz[$cont]['NOM_PROMOTOR'];
+                    echo $matriz[$cont]['TIPO_CREDITO'];
+                    echo $matriz[$cont]['UBICACIÓN_EDO'];
+                    echo $matriz[$cont]['UBICACIÓN_MUN'];
+                    echo date_format($matriz[$cont]['FECH_INI_CONTRATO'], "d-m-Y");
+                    echo $matriz[$cont]['LINEA_DE_CRE_POR_PROYECTO'];
+                    echo $matriz[$cont]['VALOR_PROYECTO'];
+                    echo $matriz[$cont]['TASA_INTERES'];
+                    echo $matriz[$cont]['VIV_TOTALES_PROYECTO'];
+                    echo date_format($matriz[$cont]['FECH_FIN_CONTRATO'], "d-m-Y");
+                    echo $matriz[$cont]['AO_VIV_ACTIVAS'];
+                    echo $matriz[$cont]['VIV_LIB_PERIODO'];
+                    echo $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO'];
+                    echo $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO'];
 
+                    /* SUMA DE COLUMNAS */
+                    echo ($datosMesPrevio[$i]['MONTO_AMORT_ACUM_P_ANTERIOR'] + $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']);
+                    echo ($datosMesPrevio[$i]['VIV_LIB_CORTE_ANTERIOR']      + $matriz[$cont]['VIV_LIB_PERIODO']);
+                    echo ($datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR']   + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']);
+                    echo ($datosMesPrevio[$i]['MONTO_MIN_ACUM_FIN_P']        + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']);
+                    echo (($matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']         - $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']) + $datosMesPrevio[$i]['SALDO_INS_P_ANTERIOR']);
+                    /* FIN SUMA DE COLUMNAS */
 
+                    echo $datosMesPrevio[$i]['VIV_LIB_CORTE_ANTERIOR'];
+                    echo $datosMesPrevio[$i]['MONTO_AMORT_ACUM_FIN_P'];
+                    echo $datosMesPrevio[$i]['SALDO_INS_CARTERA_FIN_P'];
+                    echo $datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR'];
+                    echo $matriz[$cont]['INTERESES_COBRADOS_PERIODO'];
+                    echo $datosMesPrevio[$i]['NUM_MESES_MOROSOS'];
+                    echo $matriz[$cont]['INTERESES_DEV_NO_CUBIERTOS'];
 
-        echo "<pre>";
-        print_r($datosMesPrevio);
-        echo "</pre>";
+                    // echo "<br><b>NOM_PROYECTO:</b> " . $datosMesPrevio[$i]['NOM_PROYECTO'];
+                    // echo "<br><b>FECH_COLATERAL:</b> " . "Fecha: " . $datosMesPrevio[$i]['FECH_COLATERAL'];
+                    // echo "<br><b>MONTO_POR_DISPONER:</b> " . $datosMesPrevio[$i]['MONTO_POR_DISPONER'];
+                    // echo "<br><b>ACUM_VIV_LIB_FIN_P:</b> " . $datosMesPrevio[$i]['ACUM_VIV_LIB_FIN_P'];
+                    // echo "<br><b>COMISIONES_COBRADAS_PERIODO:</b> " . $datosMesPrevio[$i]['COMISIONES_COBRADAS_PERIODO'];
+
+                    echo " <br><br> ";
+
+                }
+            }
+        }
 
         die("<br><br>Terminado");
 

@@ -51,7 +51,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1"><i class="far fa-calendar-alt"></i></span>
                   </div>
-                  <input type="text" class="form-control" pattern="" name="daterange" required readonly>
+                  <input type="date" class="form-control" pattern="" name="toUpdate" value="<?php echo date('Y-m-d'); ?>" required>
                 </div>
 
               </div>
@@ -63,7 +63,7 @@
 
                 <div class="input-group mb-3">
                   <label for="RepPagoInt" class="text-primary">Reporte pago de intereses y provisiones</label>
-                  <input type="file" class="form-control-file" name="repIntProv" id="RepPagoInt" >
+                  <input type="file" class="form-control-file" name="repIntProv" id="RepPagoInt" required>
                 </div>
 
               </div>
@@ -73,7 +73,7 @@
               <div class="col-sm">
 
                   <label for="RepMorosidad" class="text-primary">Reporte de morosidad</label>
-                  <input type="file" class="form-control-file" name="reporteMorosidad">
+                  <input type="file" class="form-control-file" name="reporteMorosidad" required>
 
               </div>
             </div>
@@ -82,7 +82,7 @@
               <div class="col-sm">
 
                   <label for="RepMorosidad" class="text-primary">Reporte de SHF</label>
-                  <input type="file" class="form-control-file" name="reporteSHF">
+                  <input type="file" class="form-control-file" name="reporteSHF" required>
 
               </div>
             </div>
