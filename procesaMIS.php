@@ -35,7 +35,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         $monthName = $dateObj->format('m');
         $preMonth = $onlyDate[0] . "-" . $monthName. "-01";
 
-        echo "<br>Month to update: " .  $mesActualziar . "<br>";
+        echo "<br>Month to update: " .  $mesActualziar;
         echo "<br>Prev month: " . $preMonth . "<br>";
 
 
@@ -60,7 +60,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         //$T_proyectos     = readProyectosDB($conn);
         //$T_intermedia    = readTablaIntermedia($conn);
 
-        echo "<br><br>";
+        //echo "<br><br>";
 
         $tsql = "SELECT
         MIS_CAT_proyectos.COLATERAL,
@@ -182,7 +182,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         $datosMesPrevio = Array();
         while( $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC))
         {
-            echo $row['NOM_PROYECTO'] . "<br>";
+            //echo $row['NOM_PROYECTO'] . "<br>";
             $datosMesPrevio[$c]['NOM_PROYECTO']                   = $row['NOM_PROYECTO'];
             $datosMesPrevio[$c]['FECH_COLATERAL']                 = date_format($row['FECH_COLATERAL'], "d-m-Y");
             $datosMesPrevio[$c]['COLATERAL']                      = $row['COLATERAL'];
@@ -230,31 +230,31 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
                     $colateralSQL[$cont][9] = $matriz[$cont]['UBICACIÓN_MUN'];
                     $colateralSQL[$cont][10] = date_format($matriz[$cont]['FECH_INI_CONTRATO'], "d-m-Y");
                     $colateralSQL[$cont][11] = number_format($matriz[$cont]['LINEA_DE_CRE_POR_PROYECTO'], 2);
-                    $colateralSQL[$cont][12] = number_format($matriz[$cont]['VALOR_PROYECTO']);
+                    $colateralSQL[$cont][12] = number_format($matriz[$cont]['VALOR_PROYECTO'], 2);
                     $colateralSQL[$cont][13] = $matriz[$cont]['TASA_INTERES'];
                     $colateralSQL[$cont][14] = $matriz[$cont]['VIV_TOTALES_PROYECTO'];
                     $colateralSQL[$cont][15] = date_format($matriz[$cont]['FECH_FIN_CONTRATO'], "d-m-Y");
                     $colateralSQL[$cont][16] = $matriz[$cont]['AO_VIV_ACTIVAS'];
                     $colateralSQL[$cont][17] = $matriz[$cont]['VIV_LIB_PERIODO'];
-                    $colateralSQL[$cont][18] = number_format($matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']);
-                    $colateralSQL[$cont][19] = number_format($matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']);
+                    $colateralSQL[$cont][18] = number_format($matriz[$cont]['MONTO_MIN_EN_EL_PERIODO'], 2);
+                    $colateralSQL[$cont][19] = number_format($matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO'], 2);
 
                     /* SUMA DE COLUMNAS */
-                    $colateralSQL[$cont][20] = number_format(($datosMesPrevio[$i]['MONTO_AMORT_ACUM_P_ANTERIOR'] + $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']));
+                    $colateralSQL[$cont][20] = number_format(($datosMesPrevio[$i]['MONTO_AMORT_ACUM_P_ANTERIOR'] + $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']), 2);
                     $colateralSQL[$cont][21] = ($datosMesPrevio[$i]['VIV_LIB_CORTE_ANTERIOR']                    + $matriz[$cont]['VIV_LIB_PERIODO']);
-                    $colateralSQL[$cont][22] = number_format(($datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR']   + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']));
-                    $colateralSQL[$cont][23] = number_format(($datosMesPrevio[$i]['MONTO_MIN_ACUM_FIN_P']        + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']));
-                    $colateralSQL[$cont][24] = number_format((($matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']         - $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']) + $datosMesPrevio[$i]['SALDO_INS_P_ANTERIOR']));
+                    $colateralSQL[$cont][22] = number_format(($datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR']   + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']), 2);
+                    $colateralSQL[$cont][23] = number_format(($datosMesPrevio[$i]['MONTO_MIN_ACUM_FIN_P']        + $matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']), 2);
+                    $colateralSQL[$cont][24] = number_format((($matriz[$cont]['MONTO_MIN_EN_EL_PERIODO']         - $matriz[$cont]['MONTO_AMORT_EN_EL_PERIODO']) + $datosMesPrevio[$i]['SALDO_INS_P_ANTERIOR']), 2);
                     /* FIN SUMA DE COLUMNAS */
 
                     $colateralSQL[$cont][25] = $datosMesPrevio[$i]['VIV_LIB_CORTE_ANTERIOR'];
-                    $colateralSQL[$cont][26] = number_format($datosMesPrevio[$i]['MONTO_AMORT_ACUM_FIN_P']);
-                    $colateralSQL[$cont][27] = number_format($datosMesPrevio[$i]['SALDO_INS_CARTERA_FIN_P']);
-                    $colateralSQL[$cont][28] = number_format($datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR']);
-                    $colateralSQL[$cont][29] = 0;
-                    $colateralSQL[$cont][30] = number_format($matriz[$cont]['INTERESES_COBRADOS_PERIODO']);
+                    $colateralSQL[$cont][26] = number_format($datosMesPrevio[$i]['MONTO_AMORT_ACUM_FIN_P'], 2);
+                    $colateralSQL[$cont][27] = number_format($datosMesPrevio[$i]['SALDO_INS_CARTERA_FIN_P'], 2);
+                    $colateralSQL[$cont][28] = number_format($datosMesPrevio[$i]['MONTO_MIN_ACUM_P_ANTERIOR'], 2);
+                    $colateralSQL[$cont][29] = number_format(0,2);
+                    $colateralSQL[$cont][30] = number_format($matriz[$cont]['INTERESES_COBRADOS_PERIODO'], 2);
                     $colateralSQL[$cont][31] = $datosMesPrevio[$i]['NUM_MESES_MOROSOS'];
-                    $colateralSQL[$cont][32] = number_format($matriz[$cont]['INTERESES_DEV_NO_CUBIERTOS']) ;
+                    $colateralSQL[$cont][32] = number_format($matriz[$cont]['INTERESES_DEV_NO_CUBIERTOS'], 2) ;
 
                     // echo "<br><b>NOM_PROYECTO:</b> " . $datosMesPrevio[$i]['NOM_PROYECTO'];
                     // echo "<br><b>FECH_COLATERAL:</b> " . "Fecha: " . $datosMesPrevio[$i]['FECH_COLATERAL'];
@@ -267,6 +267,10 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
             }
         }
 
+
+        echo "<pre>";
+        var_dump($colateralSQL);
+        echo "</pre>";
         die("<br><br>Terminado");
 
         $titulos = Array("CVE_CRED_IF", "CVE_CRED_ID_OFERTA", "NUM_REF_SHF", "NOM_CONJUNTO", "NOM_PROMOTOR", "TIPO_CREDITO", "UBICACION_ESTADO", "UBICACION_MUNICIPIO", "FECH_INI_CONTRATO", "LINEA_DE_CREDITO_POR_PROYECTO", "VALOR_PROYECTO", "TASA_INTERES", "VIVIENDAS_TOTALES_DEL_PROYECTO", "FECH_FIN_CONTRATO", "AO_VIV_ACTIVAS", "VIV_LIB_PERIODO", "MONTO_MIN_EN_EL_PERIODO", "MONTO_AMORT_EN_EL_PERIODO", "PROYECTO_MAY", "PROYECTO_MIN", "REP_MOR_INTERESES", "REP_INTPROV_INTERESES");
